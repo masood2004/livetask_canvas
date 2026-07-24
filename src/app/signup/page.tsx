@@ -6,7 +6,7 @@ export default function SignupPage() {
     <main className="auth-page">
       <Link href="/" className="brand auth-brand">
         <span className="brand-mark">LT</span>
-        <span>LiveTask Canvas</span>
+        <span>LiveTask</span>
       </Link>
 
       <section className="auth-card">
@@ -18,7 +18,7 @@ export default function SignupPage() {
         <AuthForm mode="signup" />
       </section>
 
-      <p className="auth-footnote">Session 2 · Task 2 · Next.js + Supabase</p>
+      <p className="auth-footnote">Start with a simple list. Build momentum.</p>
     </main>
   );
 }

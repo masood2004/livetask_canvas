@@ -1,27 +1,26 @@
-# LiveTask Canvas
+# LiveTask
 
-A focused authenticated task-management application created for **MERN Stack Internship 2026 — Session 2, Task 2**.
+LiveTask is a minimal, private task workspace built with Next.js and Supabase. It supports complete task management and keeps open sessions synchronized through Supabase Realtime.
 
-## Task 2 status
+## Features
 
-- Next.js web application
-- Supabase email/password authentication
-- Cookie-based SSR session support
-- Protected dashboard
-- Complete task CRUD
-- Search and status filtering
-- Task priority and due dates
-- Row-Level Security
-- Responsive interface
-- Ready for Realtime in Task 3
+- Email/password authentication
+- Protected personal workspace
+- Create, read, update and delete tasks
+- Status, priority and due dates
+- Search and status filters
+- Real-time task synchronization across browser sessions
+- Live connection indicator
+- Row-Level Security for account isolation
+- Responsive minimal interface
 
 ## Technology
 
 - Next.js 16 App Router
-- React 19
-- TypeScript
-- Supabase Auth
+- React 19 and TypeScript
+- Supabase Authentication
 - Supabase PostgreSQL
+- Supabase Realtime
 - `@supabase/ssr`
 - Plain responsive CSS
 
@@ -33,51 +32,41 @@ A focused authenticated task-management application created for **MERN Stack Int
 npm install
 ```
 
-### 2. Create a Supabase project
+### 2. Configure Supabase
 
-Create a project in Supabase, then open **SQL Editor** and run:
+Create a Supabase project and run the full contents of:
 
 ```text
 supabase/schema.sql
 ```
 
-This creates the `tasks` table, indexes, timestamp trigger and all RLS policies.
+The script creates the `tasks` table, indexes, timestamp trigger, Row-Level Security policies and adds the table to the `supabase_realtime` publication.
 
 ### 3. Add environment variables
-
-Copy the example file:
 
 ```bash
 cp .env.example .env.local
 ```
-
-Add values from the Supabase project **Connect** panel:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your_key_here
 ```
 
-Do not place a service-role key in this file or in browser code.
+Never expose a service-role key in browser code.
 
-### 4. Configure the Auth redirect URL
+### 4. Configure authentication URLs
 
-In Supabase Dashboard, open **Authentication → URL Configuration**.
-
-For local development, set:
+In **Supabase → Authentication → URL Configuration**:
 
 ```text
 Site URL: http://localhost:3000
 Redirect URL: http://localhost:3000/auth/callback
 ```
 
-After deploying, add the production callback URL as well:
+Add the production callback URL after deployment.
 
-```text
-https://your-vercel-domain.vercel.app/auth/callback
-```
-
-### 5. Run the application
+### 5. Run
 
 ```bash
 npm run dev
@@ -85,43 +74,29 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-## Build verification
+## Test real-time synchronization
 
-```bash
-npm run lint
-npm run build
-```
+1. Sign in to the same account in two browser windows.
+2. Keep the dashboard open in both windows.
+3. Create, edit, complete or delete a task in one window.
+4. The other window updates automatically without a refresh.
 
-## Important folders
+The dashboard shows **Live sync** after the Realtime channel subscribes successfully. If the connection drops, it changes to **Offline** and refreshes the latest task state when the browser reconnects.
+
+## Architecture
 
 ```text
-src/app/                   Next.js routes and global styles
-src/components/            Authentication and task-management UI
-src/lib/supabase/          Browser, server and Proxy Supabase clients
-src/types/                 Task TypeScript types
-supabase/schema.sql        Database and RLS setup
-docs/                      Assignment evidence and Loom script
+Browser A ─┐
+           ├── Supabase Auth + PostgreSQL + Realtime
+Browser B ─┘
+
+Next.js renders the application and Vercel can host it. Each signed-in client connects directly to Supabase Realtime for database-change events.
 ```
-
-## CRUD mapping
-
-| Operation | Supabase call |
-|---|---|
-| Create | `.from("tasks").insert(...).select().single()` |
-| Read | `.from("tasks").select("*")` |
-| Update | `.from("tasks").update(...).eq("id", id)` |
-| Delete | `.from("tasks").delete().eq("id", id)` |
 
 ## Security
 
-The application uses a public Supabase publishable key in the client. Data remains private because the `tasks` table has RLS enabled and each policy requires:
+The public Supabase publishable key is safe to use in the client only because Row-Level Security is enabled. Every policy requires the authenticated user ID to match the task owner:
 
 ```sql
 (select auth.uid()) = user_id
 ```
-
-The service-role key must never be exposed in the browser.
-
-## Next assignment step
-
-Session 2 Task 3 will add Supabase Realtime subscriptions to the existing `tasks` table so create, update and delete events appear in other sessions without refreshing.

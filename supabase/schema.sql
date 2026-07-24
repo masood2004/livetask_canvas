@@ -1,5 +1,5 @@
--- LiveTask Canvas — Session 2 Task 2
--- Run this entire file once in Supabase Dashboard > SQL Editor.
+-- LiveTask database setup
+-- Run this file in Supabase Dashboard > SQL Editor.
 
 create extension if not exists pgcrypto;
 
@@ -36,7 +36,23 @@ create trigger tasks_set_updated_at
 before update on public.tasks
 for each row execute function public.set_updated_at();
 
+alter table public.tasks replica identity full;
 alter table public.tasks enable row level security;
+
+-- Enable database-change events for Supabase Realtime.
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'tasks'
+  ) then
+    alter publication supabase_realtime add table public.tasks;
+  end if;
+end
+$$;
 
 revoke all on table public.tasks from anon;
 grant select, insert, update, delete on table public.tasks to authenticated;

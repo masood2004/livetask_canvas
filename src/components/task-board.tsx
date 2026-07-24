@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Task, TaskDraft, TaskPriority, TaskStatus } from "@/types/task";
@@ -41,6 +41,72 @@ export function TaskBoard({ initialTasks, userId, userEmail }: TaskBoardProps) {
   const [statusFilter, setStatusFilter] = useState<"all" | TaskStatus>("all");
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [realtimeStatus, setRealtimeStatus] = useState<"connecting" | "live" | "offline">("connecting");
+  const [lastSync, setLastSync] = useState<Date | null>(null);
+
+
+  const refreshTasks = useCallback(async () => {
+    const supabase = createClient();
+    const { data, error: refreshError } = await supabase
+      .from("tasks")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (refreshError) throw refreshError;
+    setTasks((data ?? []) as Task[]);
+    setLastSync(new Date());
+  }, []);
+
+  useEffect(() => {
+    const supabase = createClient();
+    let mounted = true;
+
+    const channel = supabase
+      .channel(`tasks:${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "tasks",
+          filter: `user_id=eq.${userId}`,
+        },
+        async () => {
+          try {
+            await refreshTasks();
+          } catch {
+            if (mounted) setRealtimeStatus("offline");
+          }
+        },
+      )
+      .subscribe((status) => {
+        if (!mounted) return;
+        if (status === "SUBSCRIBED") {
+          setRealtimeStatus("live");
+          setLastSync(new Date());
+        } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+          setRealtimeStatus("offline");
+        } else {
+          setRealtimeStatus("connecting");
+        }
+      });
+
+    const handleOnline = () => {
+      setRealtimeStatus("connecting");
+      void refreshTasks().catch(() => setRealtimeStatus("offline"));
+    };
+    const handleOffline = () => setRealtimeStatus("offline");
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      mounted = false;
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+      void supabase.removeChannel(channel);
+    };
+  }, [refreshTasks, userId]);
 
   const counts = useMemo(() => ({
     total: tasks.length,
@@ -95,7 +161,8 @@ export function TaskBoard({ initialTasks, userId, userEmail }: TaskBoardProps) {
 
       if (insertError) throw insertError;
 
-      setTasks((current) => [data as Task, ...current]);
+      setTasks((current) => [data as Task, ...current.filter((item) => item.id !== (data as Task).id)]);
+      setLastSync(new Date());
       setDraft(emptyDraft);
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "Could not create the task.");
@@ -120,6 +187,7 @@ export function TaskBoard({ initialTasks, userId, userEmail }: TaskBoardProps) {
 
       if (updateError) throw updateError;
       setTasks((current) => current.map((item) => item.id === task.id ? data as Task : item));
+      setLastSync(new Date());
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "Could not update task status.");
     } finally {
@@ -169,6 +237,7 @@ export function TaskBoard({ initialTasks, userId, userEmail }: TaskBoardProps) {
       if (updateError) throw updateError;
 
       setTasks((current) => current.map((item) => item.id === editingTask.id ? data as Task : item));
+      setLastSync(new Date());
       setEditingTask(null);
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "Could not save task changes.");
@@ -194,6 +263,7 @@ export function TaskBoard({ initialTasks, userId, userEmail }: TaskBoardProps) {
 
       if (deleteError) throw deleteError;
       setTasks((current) => current.filter((item) => item.id !== task.id));
+      setLastSync(new Date());
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "Could not delete the task.");
     } finally {
@@ -223,8 +293,7 @@ export function TaskBoard({ initialTasks, userId, userEmail }: TaskBoardProps) {
 
         <nav className="side-nav" aria-label="Workspace navigation">
           <button className="side-link active" type="button"><span>▦</span> My tasks</button>
-          <button className="side-link" type="button" disabled title="Added in Task 4"><span>✎</span> Canvas <em>Soon</em></button>
-          <button className="side-link" type="button" disabled title="Added in Task 3"><span>◉</span> Activity <em>Soon</em></button>
+          <button className="side-link" type="button" disabled><span>✎</span> Canvas <em>Soon</em></button>
         </nav>
 
         <div className="sidebar-user">
@@ -240,9 +309,16 @@ export function TaskBoard({ initialTasks, userId, userEmail }: TaskBoardProps) {
             <span className="page-kicker">Personal workspace</span>
             <h1>Good work starts with a clear plan.</h1>
           </div>
-          <button className="button button-secondary mobile-signout" onClick={signOut} disabled={busy === "signout"} type="button">
-            Sign out
-          </button>
+          <div className="header-actions">
+            <div className={`realtime-badge ${realtimeStatus}`} role="status" aria-live="polite">
+              <i />
+              <span>{realtimeStatus === "live" ? "Live sync" : realtimeStatus === "connecting" ? "Connecting" : "Offline"}</span>
+              {lastSync && realtimeStatus === "live" && <small>Updated {formatTime(lastSync)}</small>}
+            </div>
+            <button className="button button-secondary mobile-signout" onClick={signOut} disabled={busy === "signout"} type="button">
+              Sign out
+            </button>
+          </div>
         </header>
 
         <div className="stats-grid">
@@ -410,6 +486,10 @@ export function TaskBoard({ initialTasks, userId, userEmail }: TaskBoardProps) {
       )}
     </main>
   );
+}
+
+function formatTime(value: Date) {
+  return new Intl.DateTimeFormat("en", { hour: "2-digit", minute: "2-digit" }).format(value);
 }
 
 function formatDate(value: string) {

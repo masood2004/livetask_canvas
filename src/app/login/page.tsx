@@ -12,7 +12,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <main className="auth-page">
       <Link href="/" className="brand auth-brand">
         <span className="brand-mark">LT</span>
-        <span>LiveTask Canvas</span>
+        <span>LiveTask</span>
       </Link>
 
       <section className="auth-card">
@@ -24,7 +24,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <AuthForm mode="login" initialError={params.error ?? ""} />
       </section>
 
-      <p className="auth-footnote">Session 2 · Task 2 · Next.js + Supabase</p>
+      <p className="auth-footnote">Your private workspace, available anywhere.</p>
     </main>
   );
 }
