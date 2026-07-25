@@ -65,7 +65,7 @@ livetask_canvas/
 ├── mobile/              React Native Expo application
 ├── desktop/             Tauri 2 + Rust desktop application
 ├── supabase/            Shared database schema and RLS policies
-└── docs/                Demonstration and architecture notes
+└── docs/                Product demonstration, launch and architecture notes
 ```
 
 ## Web setup
@@ -103,3 +103,33 @@ See `desktop/README.md` for Rust and platform prerequisites.
 ## Chrome setup
 
 Open `chrome://extensions`, enable Developer mode, select **Load unpacked**, and choose the `extension` folder. Configure the Supabase project URL, publishable key and LiveTask web URL from the extension options page.
+
+## Production deployment
+
+Deploy the repository root as a Next.js application on Vercel and configure:
+
+```text
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+```
+
+Add the production callback URL to Supabase Authentication settings:
+
+```text
+https://YOUR-PRODUCTION-DOMAIN/auth/callback
+```
+
+Test the production URL in an incognito/private window before sharing it.
+
+## Product documentation
+
+- [`docs/PRODUCT_DEMO_SCRIPT.md`](docs/PRODUCT_DEMO_SCRIPT.md) — complete cross-platform demonstration flow
+- [`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md) — production, access and submission checks
+- [`docs/FINAL_PROJECT_PROPOSAL.md`](docs/FINAL_PROJECT_PROPOSAL.md) — Smart Travel Planner AI two-week proposal
+
+## Security
+
+- Keep `.env` and `.env.local` files out of Git.
+- Never expose a Supabase service-role key in any client.
+- Keep Row-Level Security enabled for private tables.
+- Configure secrets through Vercel and EAS environments.
