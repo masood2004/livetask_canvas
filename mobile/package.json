@@ -10,7 +10,7 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "validate:env": "node scripts/validate-env.mjs",
-    "build:apk": "npm run validate:env && eas build -p android --profile preview",
+    "build:apk": "eas build -p android --profile preview",
     "eas-build-pre-install": "node scripts/validate-env.mjs"
   },
   "dependencies": {
