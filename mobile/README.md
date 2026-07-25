@@ -75,22 +75,28 @@ eas env:list --environment preview
 
 The `preview` build profile is explicitly connected to the EAS `preview` environment in `eas.json`.
 
+To validate those same values locally, pull them first:
+
+```bash
+eas env:pull --environment preview
+npm run validate:env
+```
+
 ## Build the repaired APK
 
 ```bash
 npm install -g eas-cli
 eas login
-npm run validate:env
 eas build -p android --profile preview --clear-cache
 ```
 
-You can also use:
+For later builds, the shorter command is:
 
 ```bash
 npm run build:apk
 ```
 
-The build now runs `scripts/validate-env.mjs` on the EAS builder. If a required value is absent, the build fails before producing an APK instead of creating an app that terminates at startup.
+The EAS builder now runs `scripts/validate-env.mjs` before dependency installation. If a required value is absent, the build fails before producing an APK instead of creating an app that terminates at startup.
 
 The app also contains a startup recovery screen. If a manually produced build is missing configuration, it stays open and explains which EAS variables are required.
 
