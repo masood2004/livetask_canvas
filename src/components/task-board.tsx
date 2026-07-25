@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Task, TaskDraft, TaskPriority, TaskStatus } from "@/types/task";
@@ -292,8 +293,8 @@ export function TaskBoard({ initialTasks, userId, userEmail }: TaskBoardProps) {
         </div>
 
         <nav className="side-nav" aria-label="Workspace navigation">
-          <button className="side-link active" type="button"><span>▦</span> My tasks</button>
-          <button className="side-link" type="button" disabled><span>✎</span> Canvas <em>Soon</em></button>
+          <Link className="side-link active" href="/dashboard"><span>▦</span> My tasks</Link>
+          <Link className="side-link" href="/canvas"><span>✎</span> Canvas</Link>
         </nav>
 
         <div className="sidebar-user">

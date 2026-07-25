@@ -10,8 +10,8 @@ const features = [
     text: "Supabase authentication and Row-Level Security keep each account isolated.",
   },
   {
-    title: "Simple task flow",
-    text: "Create, prioritise, edit, complete and remove work without unnecessary complexity.",
+    title: "Visual thinking",
+    text: "Sketch ideas, annotate images, build quick diagrams and save private boards beside your tasks.",
   },
 ];
 
@@ -33,7 +33,7 @@ export default function Home() {
         <div className="eyebrow"><span /> A calm place to get things done</div>
         <h1>Plan less.<br />Finish more.</h1>
         <p className="hero-copy">
-          A focused task workspace that stays updated across every open session in real time.
+          A focused workspace for real-time tasks, visual planning and quick ideas.
         </p>
         <div className="hero-actions">
           <Link href="/signup" className="button button-primary button-large">Create workspace</Link>

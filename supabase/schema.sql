@@ -89,3 +89,47 @@ on public.tasks
 for delete
 to authenticated
 using ((select auth.uid()) = user_id);
+
+-- Private visual boards created with the HTML Canvas workspace.
+create table if not exists public.whiteboards (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  title text not null check (char_length(title) between 1 and 80),
+  snapshot text not null,
+  background text not null default '#ffffff',
+  linked_task_id uuid references public.tasks(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists whiteboards_user_updated_idx on public.whiteboards(user_id, updated_at desc);
+
+drop trigger if exists whiteboards_set_updated_at on public.whiteboards;
+create trigger whiteboards_set_updated_at
+before update on public.whiteboards
+for each row execute function public.set_updated_at();
+
+alter table public.whiteboards enable row level security;
+revoke all on table public.whiteboards from anon;
+grant select, insert, update, delete on table public.whiteboards to authenticated;
+
+drop policy if exists "Users can read their own whiteboards" on public.whiteboards;
+create policy "Users can read their own whiteboards"
+on public.whiteboards for select to authenticated
+using ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can create their own whiteboards" on public.whiteboards;
+create policy "Users can create their own whiteboards"
+on public.whiteboards for insert to authenticated
+with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can update their own whiteboards" on public.whiteboards;
+create policy "Users can update their own whiteboards"
+on public.whiteboards for update to authenticated
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can delete their own whiteboards" on public.whiteboards;
+create policy "Users can delete their own whiteboards"
+on public.whiteboards for delete to authenticated
+using ((select auth.uid()) = user_id);
