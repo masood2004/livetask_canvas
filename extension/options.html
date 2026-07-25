@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiveTask Companion Settings</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="options-body">
+  <main class="options-shell">
+    <header class="options-header">
+      <div class="extension-brand"><span>L</span><strong>LiveTask Companion</strong></div>
+      <p>Connect the browser companion to the same Supabase project used by your LiveTask web app.</p>
+    </header>
+
+    <section class="settings-card">
+      <div class="section-heading"><span>Connection</span><h1>Workspace settings</h1></div>
+      <form id="settingsForm" class="stack-form settings-form">
+        <label>Supabase project URL
+          <input id="supabaseUrl" type="url" placeholder="https://your-project.supabase.co" required>
+          <small>Use NEXT_PUBLIC_SUPABASE_URL from the web project.</small>
+        </label>
+        <label>Supabase publishable key
+          <input id="publishableKey" type="password" placeholder="sb_publishable_…" required>
+          <small>The public key is protected by your existing Row-Level Security policies.</small>
+        </label>
+        <label>LiveTask web URL
+          <input id="appUrl" type="url" placeholder="http://localhost:3000" required>
+          <small>Use the production Vercel URL after deployment.</small>
+        </label>
+        <label>Default quick-capture priority
+          <select id="defaultPriority"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select>
+        </label>
+        <label class="switch-row"><input id="notificationsEnabled" type="checkbox"><span><strong>Due-today notifications</strong><small>Show a browser reminder for incomplete tasks due today.</small></span></label>
+        <p id="settingsMessage" class="message hidden"></p>
+        <div class="settings-actions">
+          <button id="testButton" class="secondary-button" type="button">Test connection</button>
+          <button class="primary-button" type="submit">Save settings</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="settings-card secondary-card">
+      <div><span class="settings-kicker">Browser shortcuts</span><h2>Capture without breaking focus.</h2></div>
+      <div class="shortcut-list"><div><kbd>Alt</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>Y</kbd><p>Save the current page</p></div><div><kbd>Alt</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>L</kbd><p>Open LiveTask</p></div></div>
+      <button id="openShortcutSettings" class="text-button">Manage Chrome shortcuts</button>
+    </section>
+
+    <section class="danger-zone">
+      <div><strong>Reset companion</strong><p>Remove saved connection details and the extension session from this browser.</p></div>
+      <button id="resetButton" class="danger-button">Reset</button>
+    </section>
+  </main>
+  <script type="module" src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiveTask</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="popup-body">
+  <main class="popup-shell">
+    <header class="extension-header">
+      <div class="extension-brand"><span>L</span><strong>LiveTask</strong></div>
+      <button id="settingsButton" class="icon-button" title="Settings" aria-label="Open settings">•••</button>
+    </header>
+
+    <section id="setupState" class="state-card hidden">
+      <span class="state-icon">◎</span>
+      <h1>Connect your workspace</h1>
+      <p>Add your Supabase project details once, then capture tasks from anywhere.</p>
+      <button id="openSettingsButton" class="primary-button">Open settings</button>
+    </section>
+
+    <section id="authState" class="hidden">
+      <div class="section-heading"><span>Welcome back</span><h1>Sign in to LiveTask</h1></div>
+      <form id="loginForm" class="stack-form">
+        <label>Email<input id="emailInput" type="email" autocomplete="email" required></label>
+        <label>Password<input id="passwordInput" type="password" autocomplete="current-password" required></label>
+        <p id="loginError" class="message error hidden"></p>
+        <button class="primary-button" type="submit">Sign in</button>
+      </form>
+      <button id="openWebSignup" class="text-button">Create an account on the web</button>
+    </section>
+
+    <section id="appState" class="hidden">
+      <div class="quick-heading">
+        <div><span>Quick add</span><h1>Capture what matters.</h1></div>
+        <span id="connectionDot" class="connection-dot" title="Connected"></span>
+      </div>
+
+      <form id="quickForm" class="quick-form">
+        <input id="titleInput" type="text" maxlength="120" placeholder="Add a task…" required autofocus>
+        <textarea id="descriptionInput" maxlength="600" rows="2" placeholder="Optional note"></textarea>
+        <div class="form-grid">
+          <select id="priorityInput" aria-label="Priority"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select>
+          <input id="dueDateInput" type="date" aria-label="Due date">
+        </div>
+        <label class="check-row"><input id="attachPageInput" type="checkbox"> Attach current page</label>
+        <button class="primary-button" type="submit">Add task</button>
+      </form>
+
+      <div class="capture-row">
+        <button id="capturePageButton" class="secondary-button">Capture this page</button>
+        <button id="openPanelButton" class="secondary-button">Open side panel</button>
+      </div>
+
+      <p id="appMessage" class="message hidden"></p>
+
+      <section class="recent-section">
+        <div class="list-heading"><strong>Recent tasks</strong><button id="refreshButton" class="text-button">Refresh</button></div>
+        <div id="recentList" class="task-list compact-list"><div class="loading-row">Loading…</div></div>
+      </section>
+
+      <footer class="popup-footer">
+        <button id="openDashboardButton" class="text-button">Open workspace</button>
+        <button id="logoutButton" class="text-button muted">Disconnect</button>
+      </footer>
+    </section>
+  </main>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

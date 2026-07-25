@@ -9,6 +9,8 @@ export type Task = {
   status: TaskStatus;
   priority: TaskPriority;
   due_date: string | null;
+  source_url: string | null;
+  source_title: string | null;
   created_at: string;
   updated_at: string;
 };

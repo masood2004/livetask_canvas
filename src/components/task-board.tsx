@@ -121,7 +121,7 @@ export function TaskBoard({ initialTasks, userId, userEmail }: TaskBoardProps) {
 
     return tasks.filter((task) => {
       const matchesStatus = statusFilter === "all" || task.status === statusFilter;
-      const matchesSearch = !term || task.title.toLowerCase().includes(term) || task.description.toLowerCase().includes(term);
+      const matchesSearch = !term || task.title.toLowerCase().includes(term) || task.description.toLowerCase().includes(term) || (task.source_title ?? "").toLowerCase().includes(term);
       return matchesStatus && matchesSearch;
     });
   }, [tasks, search, statusFilter]);
@@ -377,6 +377,11 @@ export function TaskBoard({ initialTasks, userId, userEmail }: TaskBoardProps) {
                       <span className={`priority-pill ${task.priority}`}>{priorityLabels[task.priority]}</span>
                     </div>
                     {task.description && <p>{task.description}</p>}
+                    {task.source_url && (
+                      <a className="task-source" href={task.source_url} target="_blank" rel="noreferrer">
+                        <span>↗</span> {task.source_title || "Open captured source"}
+                      </a>
+                    )}
                     <div className="task-meta">
                       <span>{statusLabels[task.status]}</span>
                       {task.due_date && <span>Due {formatDate(task.due_date)}</span>}

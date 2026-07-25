@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiveTask Side Panel</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="panel-body">
+  <main class="panel-shell">
+    <header class="panel-header">
+      <div class="extension-brand"><span>L</span><strong>LiveTask</strong></div>
+      <div class="header-buttons">
+        <button id="panelDashboardButton" class="icon-button" title="Open workspace">↗</button>
+        <button id="panelSettingsButton" class="icon-button" title="Settings">•••</button>
+      </div>
+    </header>
+
+    <section id="panelSetupState" class="state-card hidden">
+      <span class="state-icon">◎</span><h1>Connect LiveTask</h1><p>Configure the extension to use your private workspace.</p>
+      <button id="panelOpenSettings" class="primary-button">Open settings</button>
+    </section>
+
+    <section id="panelAuthState" class="hidden panel-auth">
+      <div class="section-heading"><span>Private workspace</span><h1>Sign in</h1></div>
+      <form id="panelLoginForm" class="stack-form">
+        <label>Email<input id="panelEmail" type="email" autocomplete="email" required></label>
+        <label>Password<input id="panelPassword" type="password" autocomplete="current-password" required></label>
+        <p id="panelLoginError" class="message error hidden"></p>
+        <button class="primary-button" type="submit">Sign in</button>
+      </form>
+    </section>
+
+    <section id="panelAppState" class="hidden panel-app">
+      <section class="panel-composer">
+        <div class="composer-top"><div><span>New task</span><h1>Keep momentum.</h1></div><button id="panelCaptureButton" class="secondary-button small">Capture page</button></div>
+        <form id="panelTaskForm" class="stack-form compact-form">
+          <input id="panelTitle" type="text" maxlength="120" placeholder="What needs attention?" required>
+          <textarea id="panelDescription" maxlength="600" rows="2" placeholder="Add context"></textarea>
+          <div class="form-grid">
+            <select id="panelPriority"><option value="low">Low priority</option><option value="medium">Medium priority</option><option value="high">High priority</option></select>
+            <input id="panelDueDate" type="date" aria-label="Due date">
+          </div>
+          <button class="primary-button" type="submit">Add task</button>
+        </form>
+        <p id="panelMessage" class="message hidden"></p>
+      </section>
+
+      <section class="panel-tasks">
+        <div class="panel-tools">
+          <input id="taskSearch" type="search" placeholder="Search tasks">
+          <button id="panelRefresh" class="icon-button" title="Refresh">↻</button>
+        </div>
+        <div id="filterTabs" class="filter-tabs">
+          <button class="active" data-filter="open">Open</button>
+          <button data-filter="all">All</button>
+          <button data-filter="done">Done</button>
+        </div>
+        <div id="panelTaskList" class="task-list"><div class="loading-row">Loading tasks…</div></div>
+      </section>
+
+      <footer class="panel-footer">
+        <span id="panelUserEmail"></span>
+        <button id="panelLogout" class="text-button muted">Disconnect</button>
+      </footer>
+    </section>
+  </main>
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

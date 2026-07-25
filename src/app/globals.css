@@ -86,7 +86,7 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .section-heading { max-width: 600px; }
 .section-heading span, .panel-heading span, .auth-heading > span, .modal-heading span, .error-card > span { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 .section-heading h2 { margin: 14px 0 0; font-size: clamp(36px,5vw,58px); line-height: 1.02; letter-spacing: -.055em; }
-.feature-grid { margin-top: 48px; display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.feature-grid { margin-top: 48px; display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
 .feature-card { min-height: 210px; padding: 27px; background: transparent; border-top: 1px solid var(--ink); }
 .feature-card h3 { margin: 54px 0 11px; font-size: 21px; letter-spacing: -.035em; }
 .feature-card p { margin: 0; color: var(--muted); line-height: 1.65; }
@@ -164,6 +164,9 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .task-title-line { display: flex; align-items: center; gap: 9px; }
 .task-body h3 { margin: 0; font-size: 14px; letter-spacing: -.02em; }
 .task-body p { margin: 7px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+.task-source { max-width: 520px; margin-top: 8px; display: inline-flex; align-items: center; gap: 6px; overflow: hidden; color: var(--ink); font-size: 10px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.task-source span { color: var(--muted); }
+.task-source:hover { text-decoration: underline; }
 .task-item.is-done h3 { color: var(--muted); text-decoration: line-through; }
 .priority-pill { padding: 3px 6px; border-radius: 99px; font-size: 8px; font-weight: 800; text-transform: uppercase; }
 .priority-pill.high { color: #9f3540; background: #fff0f1; } .priority-pill.medium { color: #805c1e; background: #fff6e7; } .priority-pill.low { color: #236744; background: #ecf7f0; }
@@ -193,6 +196,7 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 1050px) {
+  .feature-grid { grid-template-columns: repeat(2,1fr); }
   .workspace-grid { grid-template-columns: 1fr; }
   .create-panel { position: static; }
   .stats-grid { grid-template-columns: repeat(2,1fr); }

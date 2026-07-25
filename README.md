@@ -74,3 +74,19 @@ Open `http://localhost:3000`.
 ## Security
 
 The browser uses only the Supabase publishable key. Row-Level Security ensures that authenticated users can only access tasks and whiteboards where `user_id = auth.uid()`. Never expose a service-role key in frontend code.
+
+## Chrome companion
+
+The `extension` folder contains a standalone Manifest V3 Chrome extension that connects to the same Supabase project and user account.
+
+It supports quick task creation, a persistent side panel, webpage and selected-text capture, source links, task status controls, an incomplete-task badge, due-today notifications, context-menu actions and keyboard shortcuts.
+
+Installation requires no extension build step:
+
+1. Run the latest `supabase/schema.sql` so existing tasks receive the optional `source_url` and `source_title` fields.
+2. Open `chrome://extensions` and enable Developer mode.
+3. Choose **Load unpacked** and select the `extension` folder.
+4. Open the extension settings and add the same Supabase URL, publishable key and LiveTask web URL.
+5. Sign in from the popup with the same LiveTask account.
+
+See `extension/README.md` for the complete workflow and security notes.

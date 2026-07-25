@@ -13,6 +13,10 @@ const features = [
     title: "Visual thinking",
     text: "Sketch ideas, annotate images, build quick diagrams and save private boards beside your tasks.",
   },
+  {
+    title: "Browser companion",
+    text: "Capture pages, selected text and quick tasks directly from Chrome without leaving your current tab.",
+  },
 ];
 
 export default function Home() {

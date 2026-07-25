@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "LiveTask — Focused task management",
-  description: "A minimal real-time task and visual planning workspace built with Next.js and Supabase.",
+  description: "A minimal real-time task, visual planning and browser-capture workspace built with Next.js and Supabase.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
