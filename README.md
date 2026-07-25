@@ -1,92 +1,105 @@
 # LiveTask
 
-LiveTask is a minimal, private productivity workspace built with Next.js and Supabase. It combines real-time task management with a visual HTML Canvas workspace for planning, diagrams, annotations and quick thinking.
+LiveTask is a minimal, private productivity workspace that stays synchronized across web, Chrome, Android and desktop. It combines real-time task management with a visual HTML Canvas workspace for planning, diagrams, annotations and quick thinking.
 
-## Features
+## Product surfaces
 
-### Task workspace
-- Email/password authentication
-- Protected personal workspace
+### Web application
+
+- Next.js 16 and TypeScript
+- Supabase email/password authentication
+- Protected task workspace
 - Complete task CRUD
 - Status, priority, due dates, search and filtering
-- Real-time synchronization across browser sessions
-- Live connection indicator
+- Real-time synchronization across sessions
+- Visual HTML Canvas editor
+- Private whiteboard storage
 
-### Visual Canvas workspace
-- Freehand pen and transparent highlighter
-- Pressure-friendly pointer drawing for mouse, touch and stylus
-- Eraser with adjustable size
-- Line, arrow, rectangle and ellipse tools
-- Text labels
-- Color presets and custom color picker
-- Adjustable brush size
-- Undo and redo history
-- Clear board with confirmation
-- Dot-grid toggle
-- Multiple board background colors
-- Zoom controls
-- Image import and annotation
-- PNG export with selected background
-- Automatic browser-local recovery
-- Private cloud save, update, load and delete
-- Optional link between a board and an existing task
+### Chrome companion
 
-## Technology
+- Quick task creation
+- Persistent side panel
+- View, filter, update and delete tasks
+- Capture the current webpage, selected text or a link
+- Preserve source URLs inside tasks
+- Badge count and due-today notifications
 
-- Next.js 16 App Router
-- React 19 and TypeScript
-- HTML Canvas API
-- Supabase Authentication
-- Supabase PostgreSQL and Realtime
-- Row-Level Security
-- `@supabase/ssr`
-- Responsive CSS
+### Android application
 
-## Setup
+- React Native with Expo
+- Persistent Supabase session
+- Complete task CRUD and real-time synchronization
+- Search, filters, pull to refresh and haptic feedback
+- Browser-source links
+- Saved Canvas board gallery and preview
+- Links to the full web Canvas editor
+
+### Desktop application
+
+- Tauri 2 native shell with Rust
+- Vite and TypeScript frontend
+- Complete task CRUD and real-time synchronization
+- Canvas board gallery
+- Native URL opening and notifications
+- Rust system-information command
+- Keyboard shortcuts
+
+## Shared architecture
+
+```text
+Next.js web ────────┐
+Chrome extension ───┤
+Expo Android ───────┼── Supabase Auth + PostgreSQL + Realtime
+Tauri desktop ──────┘              │
+                                   └── Row-Level Security
+```
+
+Every client uses the Supabase publishable key. Data remains private because each database policy requires the signed-in user ID to match the record owner.
+
+## Repository structure
+
+```text
+livetask_canvas/
+├── src/                 Next.js web application
+├── extension/           Chrome Manifest V3 extension
+├── mobile/              React Native Expo application
+├── desktop/             Tauri 2 + Rust desktop application
+├── supabase/            Shared database schema and RLS policies
+└── docs/                Demonstration and architecture notes
+```
+
+## Web setup
 
 ```bash
 npm install
 cp .env.example .env.local
-```
-
-Add your Supabase values to `.env.local`, then run the complete SQL file in **Supabase → SQL Editor**:
-
-```text
-supabase/schema.sql
-```
-
-The SQL creates the private `tasks` and `whiteboards` tables, triggers, indexes, Realtime publication configuration and Row-Level Security policies.
-
-```bash
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Run `supabase/schema.sql` once in the Supabase SQL Editor. It creates the tasks and whiteboards tables, Realtime configuration and Row-Level Security policies.
 
-## Canvas workflow
+## Android setup
 
-1. Open **Canvas** from the workspace navigation.
-2. Draw, annotate an imported image, create a diagram or add text.
-3. The current board is recovered locally while you work.
-4. Use **Save board** to store it privately in Supabase.
-5. Reopen saved boards from the sidebar or export the result as PNG.
+```bash
+cd mobile
+npm install
+cp .env.example .env
+npx expo start
+```
 
-## Security
+See `mobile/README.md` for Expo Go and Android APK build steps.
 
-The browser uses only the Supabase publishable key. Row-Level Security ensures that authenticated users can only access tasks and whiteboards where `user_id = auth.uid()`. Never expose a service-role key in frontend code.
+## Desktop setup
 
-## Chrome companion
+```bash
+cd desktop
+npm install
+cp .env.example .env
+npm run desktop
+```
 
-The `extension` folder contains a standalone Manifest V3 Chrome extension that connects to the same Supabase project and user account.
+See `desktop/README.md` for Rust and platform prerequisites.
 
-It supports quick task creation, a persistent side panel, webpage and selected-text capture, source links, task status controls, an incomplete-task badge, due-today notifications, context-menu actions and keyboard shortcuts.
+## Chrome setup
 
-Installation requires no extension build step:
-
-1. Run the latest `supabase/schema.sql` so existing tasks receive the optional `source_url` and `source_title` fields.
-2. Open `chrome://extensions` and enable Developer mode.
-3. Choose **Load unpacked** and select the `extension` folder.
-4. Open the extension settings and add the same Supabase URL, publishable key and LiveTask web URL.
-5. Sign in from the popup with the same LiveTask account.
-
-See `extension/README.md` for the complete workflow and security notes.
+Open `chrome://extensions`, enable Developer mode, select **Load unpacked**, and choose the `extension` folder. Configure the Supabase project URL, publishable key and LiveTask web URL from the extension options page.
