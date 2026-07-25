@@ -1,14 +1,7 @@
 import { createBrowserClient } from "@supabase/ssr";
+import { getSupabaseConfig } from "./env";
 
 export function createClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-
-  if (!url || !publishableKey) {
-    throw new Error(
-      "Missing Supabase environment variables. Copy .env.example to .env.local and add your project values.",
-    );
-  }
-
+  const { url, publishableKey } = getSupabaseConfig();
   return createBrowserClient(url, publishableKey);
 }
