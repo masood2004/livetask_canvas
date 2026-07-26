@@ -11,6 +11,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../lib/supabase";
 import type { WhiteboardRecord } from "../types";
 import { colors, radius } from "../theme";
@@ -75,8 +76,8 @@ export function BoardsScreen() {
         showsVerticalScrollIndicator={false}
       />
 
-      <Modal visible={!!selected} transparent animationType="fade" onRequestClose={() => setSelected(null)}>
-        <View style={styles.modalBackdrop}>
+      <Modal visible={!!selected} transparent animationType="fade" onRequestClose={() => setSelected(null)} statusBarTranslucent navigationBarTranslucent>
+        <SafeAreaView style={styles.modalBackdrop} edges={["top", "right", "bottom", "left"]}>
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
               <View style={styles.modalHeaderText}><Text style={styles.modalKicker}>BOARD PREVIEW</Text><Text style={styles.modalTitle} numberOfLines={2}>{selected?.title}</Text></View>
@@ -85,7 +86,7 @@ export function BoardsScreen() {
             {!!selected && <View style={[styles.largePreview, { backgroundColor: selected.background || "#ffffff" }]}><Image source={{ uri: selected.snapshot }} style={styles.largeImage} resizeMode="contain" /></View>}
             <Pressable style={styles.primary} onPress={() => Linking.openURL(`${webUrl}/canvas`)}><Text style={styles.primaryText}>Continue in web editor ↗</Text></Pressable>
           </View>
-        </View>
+        </SafeAreaView>
       </Modal>
     </View>
   );
