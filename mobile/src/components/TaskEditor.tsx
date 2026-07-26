@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import type { Task, TaskDraft, TaskPriority, TaskStatus } from "../types";
 import { colors, radius } from "../theme";
 
@@ -64,9 +65,9 @@ export function TaskEditor({ visible, task, busy, onClose, onSave }: Props) {
   }
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose} statusBarTranslucent navigationBarTranslucent>
       <KeyboardAvoidingView style={styles.backdrop} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <View style={styles.sheet}>
+        <SafeAreaView style={styles.sheet} edges={["right", "bottom", "left"]}>
           <View style={styles.handle} />
           <View style={styles.header}>
             <View>
@@ -109,7 +110,7 @@ export function TaskEditor({ visible, task, busy, onClose, onSave }: Props) {
               <Pressable style={styles.primary} onPress={submit} disabled={busy}><Text style={styles.primaryText}>{busy ? "Saving…" : task ? "Save changes" : "Add task"}</Text></Pressable>
             </View>
           </ScrollView>
-        </View>
+        </SafeAreaView>
       </KeyboardAvoidingView>
     </Modal>
   );
@@ -136,7 +137,7 @@ function Segmented({ values, selected, labels, onChange }: SegmentedProps) {
 
 const styles = StyleSheet.create({
   backdrop: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,.34)" },
-  sheet: { maxHeight: "92%", backgroundColor: colors.surface, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 22 },
+  sheet: { maxHeight: "92%", backgroundColor: colors.surface, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingHorizontal: 22, paddingTop: 22 },
   handle: { width: 44, height: 5, borderRadius: 3, backgroundColor: colors.line, alignSelf: "center", marginBottom: 18 },
   header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 8 },
   kicker: { color: colors.muted, fontSize: 10, fontWeight: "800", letterSpacing: 1.3 },
