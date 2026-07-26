@@ -1,8 +1,13 @@
 import { Component, type ErrorInfo, type ReactNode, useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import type { Session } from "@supabase/supabase-js";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import {
+  initialWindowMetrics,
+  SafeAreaProvider,
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { mobileConfigurationError, supabase } from "./src/lib/supabase";
 import { AuthScreen } from "./src/components/AuthScreen";
 import { TasksScreen } from "./src/components/TasksScreen";
@@ -13,9 +18,11 @@ import { colors } from "./src/theme";
 
 export default function App() {
   return (
-    <AppErrorBoundary>
-      <AppRoot />
-    </AppErrorBoundary>
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      <AppErrorBoundary>
+        <AppRoot />
+      </AppErrorBoundary>
+    </SafeAreaProvider>
   );
 }
 
@@ -57,50 +64,69 @@ function AppRoot() {
 
   if (mobileConfigurationError) {
     return (
-      <SafeAreaProvider>
-        <StatusBar style="dark" />
+      <>
+        <StatusBar style="dark" backgroundColor={colors.background} />
         <ConfigurationScreen message={mobileConfigurationError} />
-      </SafeAreaProvider>
+      </>
     );
   }
 
   if (loading) {
     return (
-      <SafeAreaProvider>
-        <View style={styles.loading}>
-          <ActivityIndicator color={colors.ink} />
-          <Text style={styles.loadingText}>Opening LiveTask…</Text>
-        </View>
-      </SafeAreaProvider>
+      <SafeAreaView style={styles.loading} edges={["top", "right", "bottom", "left"]}>
+        <StatusBar style="dark" backgroundColor={colors.background} />
+        <ActivityIndicator color={colors.ink} />
+        <Text style={styles.loadingText}>Opening LiveTask…</Text>
+      </SafeAreaView>
     );
   }
 
   if (!session?.user) {
-    return <SafeAreaProvider><StatusBar style="dark" /><AuthScreen /></SafeAreaProvider>;
+    return (
+      <>
+        <StatusBar style="dark" backgroundColor={colors.background} />
+        <AuthScreen />
+      </>
+    );
   }
 
+  return <Workspace session={session} tab={tab} onTabChange={setTab} />;
+}
+
+function Workspace({ session, tab, onTabChange }: { session: Session; tab: AppTab; onTabChange: (tab: AppTab) => void }) {
+  const insets = useSafeAreaInsets();
+  const navBottom = Math.max(insets.bottom, 8) + 8;
+  const reservedBottom = navBottom + 84;
+
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.safe}>
-        <StatusBar style="dark" />
-        <View style={styles.content}>
-          {tab === "tasks" && <TasksScreen userId={session.user.id} />}
-          {tab === "boards" && <BoardsScreen />}
-          {tab === "account" && <AccountScreen user={session.user} />}
-        </View>
-        <View style={styles.nav}>
-          <Tab value="tasks" active={tab === "tasks"} icon="✓" label="Tasks" onPress={setTab} />
-          <Tab value="boards" active={tab === "boards"} icon="□" label="Boards" onPress={setTab} />
-          <Tab value="account" active={tab === "account"} icon="○" label="Account" onPress={setTab} />
-        </View>
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <View
+      style={[
+        styles.safe,
+        {
+          paddingTop: insets.top,
+          paddingLeft: insets.left,
+          paddingRight: insets.right,
+        },
+      ]}
+    >
+      <StatusBar style="dark" backgroundColor={colors.background} />
+      <View style={[styles.content, { paddingBottom: reservedBottom }]}>
+        {tab === "tasks" && <TasksScreen userId={session.user.id} />}
+        {tab === "boards" && <BoardsScreen />}
+        {tab === "account" && <AccountScreen user={session.user} />}
+      </View>
+      <View style={[styles.nav, { bottom: navBottom }]}>
+        <Tab value="tasks" active={tab === "tasks"} icon="✓" label="Tasks" onPress={onTabChange} />
+        <Tab value="boards" active={tab === "boards"} icon="□" label="Boards" onPress={onTabChange} />
+        <Tab value="account" active={tab === "account"} icon="○" label="Account" onPress={onTabChange} />
+      </View>
+    </View>
   );
 }
 
 function ConfigurationScreen({ message }: { message: string }) {
   return (
-    <SafeAreaView style={styles.configSafe}>
+    <SafeAreaView style={styles.configSafe} edges={["top", "right", "bottom", "left"]}>
       <ScrollView contentContainerStyle={styles.configContent}>
         <View style={styles.configMark}><Text style={styles.configMarkText}>LT</Text></View>
         <Text style={styles.configKicker}>BUILD CONFIGURATION</Text>
@@ -144,9 +170,9 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryS
     if (!this.state.error) return this.props.children;
 
     return (
-      <SafeAreaProvider>
-        <StatusBar style="dark" />
-        <SafeAreaView style={styles.configSafe}>
+      <>
+        <StatusBar style="dark" backgroundColor={colors.background} />
+        <SafeAreaView style={styles.configSafe} edges={["top", "right", "bottom", "left"]}>
           <View style={styles.configContent}>
             <View style={styles.configMark}><Text style={styles.configMarkText}>!</Text></View>
             <Text style={styles.configKicker}>STARTUP RECOVERY</Text>
@@ -158,7 +184,7 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryS
             </View>
           </View>
         </SafeAreaView>
-      </SafeAreaProvider>
+      </>
     );
   }
 }
@@ -168,7 +194,7 @@ const styles = StyleSheet.create({
   content: { flex: 1 },
   loading: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.background, gap: 12 },
   loadingText: { color: colors.muted, fontSize: 13 },
-  nav: { position: "absolute", left: 14, right: 14, bottom: 12, height: 72, flexDirection: "row", backgroundColor: "rgba(255,255,255,.97)", borderWidth: 1, borderColor: colors.line, borderRadius: 22, paddingHorizontal: 10, paddingVertical: 8 },
+  nav: { position: "absolute", left: 14, right: 14, height: 72, flexDirection: "row", backgroundColor: "rgba(255,255,255,.97)", borderWidth: 1, borderColor: colors.line, borderRadius: 22, paddingHorizontal: 10, paddingVertical: 8 },
   tab: { flex: 1, alignItems: "center", justifyContent: "center", gap: 4 },
   tabIcon: { width: 28, height: 28, borderRadius: 10, alignItems: "center", justifyContent: "center" },
   tabIconActive: { backgroundColor: colors.ink },
